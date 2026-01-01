@@ -7,6 +7,7 @@
 _command_history_preexec() {
     local cmd="$1"
     local dir="$(pwd)"
+    local realdir="$(pwd -P)"
     local timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
     # 空のコマンドは記録しない
@@ -16,8 +17,9 @@ _command_history_preexec() {
     jq -c -n \
         --arg cmd "$cmd" \
         --arg dir "$dir" \
+        --arg realdir "$realdir" \
         --arg ts "$timestamp" \
-        '{command: $cmd, directory: $dir, timestamp: $ts}' \
+        '{command: $cmd, dir: $dir, realdir: $realdir, timestamp: $ts}' \
         >> "$COMMAND_HISTORY_FILE"
 }
 
