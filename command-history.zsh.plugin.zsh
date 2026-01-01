@@ -41,7 +41,8 @@ _command_history_select() {
     local selected=$(tac "$COMMAND_HISTORY_FILE" | \
         jq -r --arg realdir "$current_realdir" 'select(.realdir == $realdir) | .command' 2>/dev/null | \
         awk '!a[$0]++' | \
-        fzf --multi \
+        bat --plain --color always --language bash | \
+        fzf --multi --ansi \
     )
 
     if [[ -n "$selected" ]]; then
