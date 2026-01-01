@@ -8,7 +8,7 @@ _command_history_preexec() {
     local cmd="$1"
     local dir="$(pwd)"
     local realdir="$(pwd -P)"
-    local timestamp="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+    local timestamp="$(TZ='Asia/Tokyo' date +"%Y-%m-%dT%H:%M:%S+09:00")"
 
     # 空のコマンドは記録しない
     [[ -z "$cmd" ]] && return
