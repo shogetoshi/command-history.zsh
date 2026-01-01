@@ -34,9 +34,12 @@ _command_history_select() {
         touch "$COMMAND_HISTORY_FILE"
     fi
 
-    # JSONLからコマンドを抽出してfzfで選択（新しい順に表示）
+    # 現在のディレクトリのrealpath（シンボリックリンク解決後）
+    local current_realdir="$(pwd -P)"
+
+    # JSONLから現在のrealdirと一致するエントリのみ抽出してfzfで選択（新しい順に表示）
     local selected=$(tac "$COMMAND_HISTORY_FILE" | \
-        jq -r '.command' 2>/dev/null | \
+        jq -r --arg realdir "$current_realdir" 'select(.realdir == $realdir) | .command' 2>/dev/null | \
         awk '!a[$0]++' | \
         fzf \
     )
