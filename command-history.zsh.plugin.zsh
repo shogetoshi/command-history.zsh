@@ -29,26 +29,17 @@ add-zsh-hook preexec _command_history_preexec
 
 # コマンド履歴選択用ZLEウィジェット
 _command_history_select() {
-    # fzfが利用可能かチェック
-    if ! command -v fzf &> /dev/null; then
-        zle -M "fzfがインストールされていません"
-        return 1
-    fi
-
     # 履歴ファイルが存在しない場合
     if [[ ! -f "$COMMAND_HISTORY_FILE" ]]; then
-        zle -M "履歴ファイルが存在しません: $COMMAND_HISTORY_FILE"
-        return 1
+        touch "$COMMAND_HISTORY_FILE"
     fi
 
     # JSONLからコマンドを抽出してfzfで選択（新しい順に表示）
-    # macOS互換: tacがなければtail -rを使用
-    local selected
-    if command -v tac &> /dev/null; then
-        selected=$(tac "$COMMAND_HISTORY_FILE" | jq -r '.command' 2>/dev/null | fzf --height 40% --reverse --prompt="履歴> ")
-    else
-        selected=$(tail -r "$COMMAND_HISTORY_FILE" | jq -r '.command' 2>/dev/null | fzf --height 40% --reverse --prompt="履歴> ")
-    fi
+    local selected=$(tac "$COMMAND_HISTORY_FILE" | \
+        jq -r '.command' 2>/dev/null | \
+        awk '!a[$0]++' | \
+        fzf \
+    )
 
     if [[ -n "$selected" ]]; then
         # 現在のバッファを置き換え
