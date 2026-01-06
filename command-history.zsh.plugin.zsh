@@ -1,5 +1,7 @@
 # command-history.zsh - コマンド履歴をJSONL形式で保存するzshプラグイン
 
+SCRIPT_DIR="${0:A:h}"
+
 # 履歴ファイルのパス（カスタマイズ可能）
 : ${COMMAND_HISTORY_FILE:="${HOME}/.command_history.jsonl"}
 
@@ -38,11 +40,9 @@ _command_history_select() {
     local current_realdir="$(pwd -P)"
 
     # JSONLから現在のrealdirと一致するエントリのみ抽出してfzfで選択（新しい順に表示）
-    local selected=$(tac "$COMMAND_HISTORY_FILE" | \
-        jq -r --arg realdir "$current_realdir" 'select(.realdir == $realdir) | .command' 2>/dev/null | \
-        awk '!a[$0]++' | \
-        bat --plain --color always --language bash | \
+    local selected=$(bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE $current_realdir | \
         fzf --multi --ansi \
+        --bind "ctrl-r:reload:bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE" \
     )
 
     if [[ -n "$selected" ]]; then
