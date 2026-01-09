@@ -41,7 +41,9 @@ _command_history_select() {
 
     # JSONLから現在のrealdirと一致するエントリのみ抽出してfzfで選択（新しい順に表示）
     local selected=$(bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE $current_realdir | \
-        fzf --read0 --multi --ansi --wrap --delimiter '\n' --nth '2..' \
+        fzf --read0 --multi --ansi --wrap \
+        --query "${BUFFER%% *} " \
+        --delimiter '\n' --nth '2..' \
         --bind "ctrl-r:reload:bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE" | \
         sed '1d'
     )
