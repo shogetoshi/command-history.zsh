@@ -43,8 +43,10 @@ _command_history_select() {
     local selected=$(bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE $current_realdir | \
         fzf --read0 --multi --ansi --wrap \
         --query "${BUFFER%% *} " \
-        --delimiter '\n' --nth '2..' \
-        --bind "ctrl-r:reload:bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE" | \
+        --delimiter '\n' --with-nth '2..' \
+        --preview 'echo {1}/' \
+        --preview-window 'hidden:wrap:up:3' \
+        --bind "ctrl-r:toggle-preview+reload:bash $SCRIPT_DIR/source_command.sh $COMMAND_HISTORY_FILE" | \
         sed '1d'
     )
 
